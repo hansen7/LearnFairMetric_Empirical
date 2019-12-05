@@ -15,3 +15,26 @@ Columns include the following informations:
 
 
 *** Columns 145-153(Omitted)**: Demographic data about the respondents.
+
+
+
+If you like it, please see our description [here](https://arxiv.org/abs/1910.10255), it is now accepted by NeurIPS 2019 HCML Workshop, you cite it with the bibtex here :)
+
+```
+@article{journals/corr/abs-1910-10255,
+  author    = {Hanchen Wang and
+               Nina Grgic{-}Hlaca and
+               Preethi Lahoti and
+               Krishna P. Gummadi and
+               Adrian Weller},
+  title     = {An Empirical Study on Learning Fairness Metrics for {COMPAS} Data
+               with Human Supervision},
+  journal   = {CoRR},
+  volume    = {abs/1910.10255},
+  year      = {2019},
+  url       = {http://arxiv.org/abs/1910.10255},
+  archivePrefix = {arXiv},
+  eprint    = {1910.10255},
+}
+```
+
