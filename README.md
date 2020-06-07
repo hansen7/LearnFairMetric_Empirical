@@ -1,11 +1,11 @@
 # LearnFairMetric_Empirical
-The collected responding is a dataframe is 20(human respondents) * 153 (info about the questions) .
+The collected responding is a dataframe is 20 (human respondents) * 153 (info about the questions) .
 
 Columns include the following informations:
 
-*** Columns 1-3**: time metadata of the questionnaire responding
+`Columns 1-3`: time metadata of the questionnaire responding
 
-*** Columns 4-144**: Answers to questions about defendants.
+`Columns 4-144`: Answers to questions about defendants.
 
 > * There are 7 columns per defendant. 4 of these columns contain timing metadata, you can disregard them. 3 of these columns contain the survey answers - this is what you're interested in. The names of these columns are of the form: "**Defendant_<ID>_Likelihood**", "**Defendant_<ID>_Decision**" and "**Defendant_<ID>_Confidence**", where the substring "<ID>" is replaced with the defendant's id.
 > *  The column "**Defendant_<ID>_Likelihood**" contains the answer to the question "How likely do you think it is that this person will commit another crime within 2 years?". This is what we use to learn the distance metric / decision space.
@@ -14,14 +14,14 @@ Columns include the following informations:
 
 
 
-*** Columns 145-153(Omitted)**: Demographic data about the respondents.
+`Columns 145-153(Omitted)`: Demographic data about the respondents.
 
 
 
-If you like it, please see our description [here](https://arxiv.org/abs/1910.10255), it is now accepted by NeurIPS 2019 HCML Workshop, you cite it with the bibtex here :)
+You can see more description and analysis [here](https://arxiv.org/abs/1910.10255), it is accepted by NeurIPS 2019 HCML Workshop, we would love you to cite our work if you find it helpful :) :)
 
 ```
-@article{journals/corr/abs-1910-10255,
+@article{empirial-fair-metric,
   author    = {Hanchen Wang and
                Nina Grgic{-}Hlaca and
                Preethi Lahoti and
