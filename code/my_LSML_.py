@@ -1,6 +1,6 @@
-import numpy as np, scipy.linalg as LA, pandas as pd
+#  Copyright (c) 2020. Hanchen Wang, hw501@cam.ac.uk
+import random, warnings, itertools, numpy as np, scipy.linalg as LA, pandas as pd
 from numpy.linalg import LinAlgError
-import warnings, random, itertools
 
 
 class NonPSDError(LinAlgError):
@@ -395,4 +395,3 @@ if __name__ == '__main__':
 
     lsml = LSML(sigma=0.001)
     lsml.fit(X=X_train, comparisons=quadruplets)
-

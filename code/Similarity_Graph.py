@@ -1,3 +1,5 @@
+#  Copyright (c) 2020. Hanchen Wang, hw501@cam.ac.uk
+
 import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
