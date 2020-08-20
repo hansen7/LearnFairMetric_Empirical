@@ -1,3 +1,5 @@
+#  Copyright (c) 2020. Hanchen Wang, hw501@cam.ac.uk
+
 import numpy as np
 from itertools import compress
 from numpy.matlib import repmat
@@ -34,23 +36,22 @@ class SERAPH(object):
         """
         epsp = 1e-12
         N, _ = self.X.shape
-        XAX = np.dot(self.X@A, self.X.T)
+        XAX = np.dot(self.X @ A, self.X.T)
         X2 = np.diag(XAX)
         X2X = (np.zeros((len(X2), len(X2))) + X2)
         DD = X2X + X2X.T - 2 * XAX
-        PP = 1/(1+np.exp(DD-eta)) + epsp
+        PP = 1 / (1 + np.exp(DD - eta)) + epsp
         ONE = np.ones((N, N))
         LL = np.zeros((N, N))
-        # print(LL.shape, PP.shape, ONE.shape)
         LL[S == 1] = np.log(PP[S == 1])
         LL[D == 1] = np.log(ONE[D == 1] - PP[D == 1])
         U = ONE - S - D - np.diag(np.ones(N))
 
         if mu > 0:
             LL[U == 1] = mu * (PP[U == 1] * np.log(PP[U == 1]) +
-                               (ONE[U == 1] - PP[U == 1]) * np.log(ONE[U == 1]-PP[U == 1]))
+                               (ONE[U == 1] - PP[U == 1]) * np.log(ONE[U == 1] - PP[U == 1]))
 
-        objL = np.sum(LL)/2 - lambda_ * np.trace(A)
+        objL = np.sum(LL) / 2 - lambda_ * np.trace(A)
 
         return objL
 
@@ -60,11 +61,11 @@ class SERAPH(object):
         """
         epsp = 1e-12
         N, M = self.X.shape
-        XAX = np.dot(self.X@A, self.X.T)
+        XAX = np.dot(self.X @ A, self.X.T)
         X2 = np.diag(XAX)
         X2X = (np.zeros((len(X2), len(X2))) + X2)
         DD = X2X + X2X.T - 2 * XAX
-        PP = 1/(1+np.exp(DD-eta)) + epsp
+        PP = 1 / (1 + np.exp(DD - eta)) + epsp
         ONE = np.ones((N, N))
 
         CC = np.zeros((N, N))
@@ -81,7 +82,6 @@ class SERAPH(object):
 
         grad = np.dot(self.X.T, np.sum(CC, 1).reshape(len(CC), 1) * self.X) - np.dot(self.X.T @ CC, self.X)
         grad = grad - lambda_ * np.diag(np.ones(M))
-        # print(grad)
         return grad
 
     def solver_GP(self, eta, mu, lambda_, S, D, A_Init=None):
@@ -111,10 +111,10 @@ class SERAPH(object):
             mu = nLabeled / nUnlabeled
 
         if not A_Init:
-            A_Init = M/(M+1) * np.diag(np.ones(M))
+            A_Init = M / (M + 1) * np.diag(np.ones(M))
 
         iterGP = 0
-        A_pre = (A_Init + A_Init.T)/2
+        A_pre = (A_Init + A_Init.T) / 2
         objL_pre = self.computeObj_GP(eta, mu, lambda_, S, D, A_pre)
         A_best = A_pre
         objL_best = objL_pre
@@ -126,7 +126,7 @@ class SERAPH(object):
             # compute gradient
             grad = self.computeGrad_GP(eta, mu, lambda_, S, D, A_pre)
 
-            # choose stepsize
+            # choose step size
             deltak = 0.1 * M / (np.linalg.norm(grad, ord='fro') * np.sqrt(iterGP))
             deltakk = deltak
 
@@ -138,7 +138,7 @@ class SERAPH(object):
                 A = A_pre + np.dot(deltak, grad)
 
                 # projection
-                A = (A + A.T)/2
+                A = (A + A.T) / 2
                 b, V = np.linalg.eig(A)
 
                 b = b * (b > 0)
@@ -150,13 +150,13 @@ class SERAPH(object):
                 if objL >= objL_pre:  # success
                     objL_pre = objL
                     break
-                else: # fail
+                else:  # fail
                     deltak = deltak / 2
 
             if trial == maxTrial:  # fail
                 print('GP update fails...\n')
                 A = A_pre + 2 * deltakk * grad
-                A = (A + A.T)/2
+                A = (A + A.T) / 2
                 b, V = np.linalg.eig(A)
                 # b = np.diag(b)
                 b = b * (b > 0)
@@ -177,7 +177,7 @@ class SERAPH(object):
         return A_Final, iterGP
 
     def getProjection(self, A, d):
-        A = (A + A.T)/2
+        A = (A + A.T) / 2
         D, V = np.linalg.eig(A)
         ds, di = np.sort(D)[::-1], np.argsort(D)[::-1]
         B = V[:, di[:d]]
@@ -191,7 +191,7 @@ class SERAPH(object):
         # one-nearest-neighbor classifier
         X = self.X[(self.Y != 0).ravel(), :]
         Y = self.Y[(self.Y != 0).ravel()]
-        D = np.diag(np.dot(X@A, X.T)) - 2 * np.dot(X@A, x.T)
+        D = np.diag(np.dot(X @ A, X.T)) - 2 * np.dot(X @ A, x.T)
         y = np.min(Y[D == min(D)])
         return y
 
@@ -201,11 +201,11 @@ class SERAPH(object):
         S, D = self.construct_S_D()
         print('Finish Generating Similarity/Dissimilarity Constraints')
 
-        nLabeled = np.sum(S+D)/2
-        nUnlabeled = N*(N-1)/2 - nLabeled
-        mu = nLabeled/nUnlabeled
+        nLabeled = np.sum(S + D) / 2
+        nUnlabeled = N * (N - 1) / 2 - nLabeled
+        mu = nLabeled / nUnlabeled
 
-        A, _ = self.solver_GP(1, 100*mu, 0, S, D)
+        A, _ = self.solver_GP(1, 100 * mu, 0, S, D)
 
         print(A)
         P = self.getProjection(A, 2)

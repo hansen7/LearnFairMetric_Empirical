@@ -1,13 +1,13 @@
-from metric_learn import MMC_Supervised, LMNN, MMC
-import numpy as np, pandas as pd, seaborn as sns
-import matplotlib.pyplot as plt
-import warnings, os, re, sys
+#  Copyright (c) 2020. Hanchen Wang, hw501@cam.ac.uk
+
+import warnings, numpy as np, pandas as pd, seaborn as sns, matplotlib.pyplot as plt
+from sklearn.exceptions import DataConversionWarning
 from sklearn.neighbors import DistanceMetric
-from utils import preprocessing_data_with_unit_var, \
-                    weighted_prediction_round, weighted_prediction_quantile, one_hot_vec
+from utils import one_hot_vec
+from metric_learn import MMC
+
 # from Similarity_Graph import connectivity_sanity_check, confidence_calibration_check,\
 #     similarity_edges_from_metric_by_knn
-from sklearn.exceptions import DataConversionWarning
 
 sns.set()
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -131,11 +131,11 @@ def connectivity_sanity_check_hcon(similarity_edges, respondent_idx, y_test_all)
     for idx in my_dict.keys():
         sum_df.loc[idx, "Amount"] = len(my_dict[idx])
         try:
-            sum_df.loc[idx, "Accuracy"] = \
-                len(set(my_dict[idx]).intersection(
-                    set(weighted_y_test.loc[weighted_y_test[respondent_idx] ==
-                                            weighted_y_test.loc[idx, respondent_idx]].index))) \
-                / len(my_dict[idx])
+            sum_df.loc[idx, "Accuracy"] = len(
+                set(my_dict[idx]).intersection(
+                    set(weighted_y_test.loc[
+                            weighted_y_test[respondent_idx] ==
+                            weighted_y_test.loc[idx, respondent_idx]].index))) / len(my_dict[idx])
 
         except ZeroDivisionError:
             sum_df.loc[idx, "Accuracy"] = 0
@@ -171,7 +171,6 @@ def learn_mmc_metric(X_test):
 
     for respondent_id in range(1, 21):
 
-        # y_test = pd.DataFrame(pd.read_pickle(r'../data/HCON/HCON_long_lik.pkl')[respondent_id]).values.reshape(-1, 1)
         y_test = pd.DataFrame(pd.read_pickle(r'../data/HCON/HCON_long_lik.pkl')[respondent_id]).values.reshape(-1, 1)
 
         mask = (y_test[None] == y_test[:, None])[:, :, 0]
@@ -190,7 +189,6 @@ def learn_mmc_metric(X_test):
             M = 0.01 * np.diag(np.ones(9))
 
         mmc_dict['R%d' % respondent_id] = M * 100
-        print('R:%2d' % respondent_id, ' First Row of MMC Mahalabobis Matrix:', (M[0] * 100).round(3))
+        print('R:%2d' % respondent_id, ' First Row of MMC Mahalanobis Matrix:', (M[0] * 100).round(3))
 
     return mmc_dict
-

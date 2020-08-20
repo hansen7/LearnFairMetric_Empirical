@@ -1,7 +1,8 @@
-import numpy as np, pandas as pd, matplotlib.pyplot as plt
-import warnings
-from sklearn import preprocessing
+#  Copyright (c) 2020. Hanchen Wang, hw501@cam.ac.uk
+
+import warnings, numpy as np, pandas as pd, matplotlib.pyplot as plt
 from sklearn.exceptions import DataConversionWarning
+from sklearn import preprocessing
 
 
 # General Entropy Calculation, input a vector
@@ -15,8 +16,6 @@ def entropy(labels):
     probs = counts[np.nonzero(counts)] / n_labels
     n_classes = len(probs)
 
-    if n_classes <= 1:
-        return 0
     return -np.sum(probs * np.log2(probs) / np.log2(n_classes))
 
 
@@ -24,7 +23,7 @@ def entropy(labels):
 def ent_mat(matrix):
     ent_list = []
     for idx in range(len(matrix[1])):
-        ent_list.append(1-entropy(matrix[:,idx].astype(np.int64)))
+        ent_list.append(1 - entropy(matrix[:, idx].astype(np.int64)))
     return ent_list
 
 
@@ -32,21 +31,20 @@ def ent_mat(matrix):
 def ent_cons(matrix):
     ent_list = []
     for idx in range(len(matrix[1])):
-        ent_list.append(1-entropy(matrix[:, idx].astype(np.int64)))
+        ent_list.append(1 - entropy(matrix[:, idx].astype(np.int64)))
     return 1. - np.array(ent_list)
 
 
 def test_ent_cons():
-    # test instance
     a = [1, 0, 0, 1]
     print(entropy(a))
     n_points = 100
     a = []
     for i in range(1, n_points):
-        a.append(i*[0] + (n_points - i)*[1])
+        a.append(i * [0] + (n_points - i) * [1])
     a = np.array(a)
 
-    plt.figure(figsize = (18, 5))
+    plt.figure(figsize=(18, 5))
     plt.subplot(1, 2, 1)
     plt.plot(np.linspace(0, 1, 100), ent_mat(a))
     plt.title('Binary Entropy')
@@ -58,7 +56,7 @@ def test_ent_cons():
     plt.savefig(r'../results/Binary_Entropy_Function_Graph.png')
 
 
-def preprocessing_data(X_test, y_test, broward_):
+def preprocessing_data(X_test, y_test):
     warnings.filterwarnings(action='ignore', category=DataConversionWarning)
     X_test_rescale = pd.DataFrame(preprocessing.scale(X_test),
                                   columns=X_test.columns,
@@ -72,7 +70,7 @@ def preprocessing_data_with_unit_var(X_test, select_col=(
         'age', 'juv_fel_count', 'juv_misd_count', 'priors_count')):
     warnings.filterwarnings(action='ignore', category=DataConversionWarning)
     select_col = list(select_col)
-    not_select_col = list(set(X_test.columns)-set(select_col))
+    not_select_col = list(set(X_test.columns) - set(select_col))
 
     X_test_rescale = pd.DataFrame(preprocessing.scale(X_test[select_col]),
                                   columns=X_test[select_col].columns,
@@ -108,7 +106,7 @@ def load_dataset(onehot=True):
     # reduced_broward = broward_.iloc[select_list]
     # X_train, X_test, y_train, y_test = train_test_split(
     #     X, y, test_size=0.3, random_state=0)
-    X_test, X_train,  = X.iloc[select_list], X.drop(X.index[select_list])
+    X_test, X_train, = X.iloc[select_list], X.drop(X.index[select_list])
     y_test, y_train = y.iloc[select_list], y.drop(y.index[select_list])
 
     if onehot:
@@ -118,11 +116,7 @@ def load_dataset(onehot=True):
 
 
 def one_hot_vec(X_train, X_test):
-    """
-    encode the non-binomial categorical variable (race) into one-hot vector
-    :param X_train:
-    :param X_test:
-    :return:
+    """ encode the non-binomial categorical variable (race) into one-hot vector
     """
     warnings.filterwarnings("ignore", category=FutureWarning)
     X_train.is_copy = False
@@ -173,8 +167,8 @@ def weighted_prediction_res(respondent):
     for i in range(n_rounds):  # run decision from 1 to 10
         pred_df = pd.read_csv(r'../new_data/%d_Decision.csv' % i)
         conf_df = pd.read_csv(r'../new_data/%d_Confidence.csv' % i)
-        pred_.append(pred_df.iloc[:, respondent+1].values)
-        conf_.append(conf_df.iloc[:, respondent+1].values)
+        pred_.append(pred_df.iloc[:, respondent + 1].values)
+        conf_.append(conf_df.iloc[:, respondent + 1].values)
 
     pred_df = pd.DataFrame(np.array(pred_, dtype='float64'),
                            index=range(1, n_rounds + 1),
@@ -197,9 +191,9 @@ def weighted_prediction_round(round_idx):
     :return: DataFrame of confidence weighted prediction at round_idx,
               n_defendants * n_respondents -> 50 * 35 in this case
     """
-    _, X_test, _, y_test, _ = load_dataset(onehot=True)
-    pred_df = pd.read_csv(r'../new_data/%d_Decision.csv' % (round_idx-1))
-    conf_df = pd.read_csv(r'../new_data/%d_Confidence.csv' % (round_idx-1))
+    # _, X_test, _, y_test, _ = load_dataset(onehot=True)
+    pred_df = pd.read_csv(r'../new_data/%d_Decision.csv' % (round_idx - 1))
+    conf_df = pd.read_csv(r'../new_data/%d_Confidence.csv' % (round_idx - 1))
     pred_df = pred_df.iloc[:, 1:]
     pred_df[pred_df == 0] = -1
     weighted_pred_df = pd.DataFrame(pred_df.values * conf_df.iloc[:, 1:].values,
@@ -226,11 +220,11 @@ def weighted_prediction_quantile(weighted_df, div=2):
 
     pos_cache = (pos_df.apply(lambda x: pd.qcut(
         x.dropna(), min(div, len(x.dropna())), labels=False, duplicates='drop'),
-                              axis=0).applymap(lambda x: x+1) + backbone_df).fillna(0)
+                              axis=0).applymap(lambda x: x + 1) + backbone_df).fillna(0)
 
     neg_cache = (neg_df.apply(lambda x: pd.qcut(
         x.dropna(), min(div, len(x.dropna())), labels=False, duplicates='drop'),
-                              axis=0).applymap(lambda x: x+div+1) + backbone_df).fillna(0)
+                              axis=0).applymap(lambda x: x + div + 1) + backbone_df).fillna(0)
 
     # container_df += pos_df.apply(lambda x: pd.qcut(x.dropna(), min(div, len(x.dropna())),
     #                                                labels=False, duplicates='drop'), axis=0).fillna(0)
@@ -255,4 +249,3 @@ if __name__ == '__main__':
 
     df_ = weighted_prediction_round(round_idx=1)
     rank_df = weighted_prediction_quantile(df_)
-
